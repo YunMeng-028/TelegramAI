@@ -1,0 +1,136 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+.venv/
+venv/
+ENV/
+env/
+poetry.lock
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Electron
+dist/
+out/
+.webpack/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Project specific
+data/sessions/
+data/*.db
+data/cache/
+logs/
+*.log
+.env
+.env.local
+.env.*.local
+config/local.json
+license.key
+*.session
+*.session-journal
+
+# Testing
+.coverage
+.pytest_cache/
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+
+# Documentation
+docs/_build/
+docs/.sphinx/
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+~$*
+
+# Security & Sensitive Files
+*.pem
+*.key
+*.cert
+*.crt
+*.p12
+*.pfx
+private/
+api_keys.json
+credentials.json
+auth_config.json
+claude_code_config.json
+settings.json
+
+# Claude Code specific
+claude_sessions/
+.claude/
+claude_cache/
+
+# Telegram sessions and data
+telegram_sessions/
+sessions/
+*.session
+*.session-journal
+data/*.sqlite
+data/*.sqlite3
+data/*.db
+
+# Additional sensitive patterns
+.env.*
+!.env.example
+config.json
+license.key
