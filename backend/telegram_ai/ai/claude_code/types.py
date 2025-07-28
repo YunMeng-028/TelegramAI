@@ -2,14 +2,15 @@
 Claude Code 类型定义
 """
 
-from typing import Optional, List, Dict, Any, Literal, TypedDict
-from datetime import datetime
 from dataclasses import dataclass, field
+from datetime import datetime
 from enum import Enum
+from typing import Any, Literal, TypedDict
 
 
 class ClaudeCodeTool(str, Enum):
     """Claude Code 工具枚举"""
+
     BASH = "Bash"
     EDIT = "Edit"
     GLOB = "Glob"
@@ -29,78 +30,86 @@ class ClaudeCodeTool(str, Enum):
 @dataclass
 class ClaudeCodeOptions:
     """Claude Code 选项配置"""
+
     max_turns: int = 3
-    system_prompt: Optional[str] = None
-    allowed_tools: Optional[List[ClaudeCodeTool]] = None
-    permissions: Optional[Dict[str, List[str]]] = None
+    system_prompt: str | None = None
+    allowed_tools: list[ClaudeCodeTool] | None = None
+    permissions: dict[str, list[str]] | None = None
     temperature: float = 0.7
-    output_format: Literal['text', 'json', 'stream'] = 'stream'
-    api_key: Optional[str] = None
-    timeout: Optional[int] = None
+    output_format: Literal["text", "json", "stream"] = "stream"
+    api_key: str | None = None
+    timeout: int | None = None
 
 
 @dataclass
 class ToolCall:
     """工具调用信息"""
+
     id: str
     tool: ClaudeCodeTool
-    arguments: Dict[str, Any]
-    result: Optional[Any] = None
+    arguments: dict[str, Any]
+    result: Any | None = None
 
 
 @dataclass
 class ClaudeCodeMessage:
     """Claude Code 消息"""
-    role: Literal['user', 'assistant', 'system']
+
+    role: Literal["user", "assistant", "system"]
     content: str
-    tool_calls: Optional[List[ToolCall]] = None
-    timestamp: Optional[datetime] = field(default_factory=datetime.now)
+    tool_calls: list[ToolCall] | None = None
+    timestamp: datetime | None = field(default_factory=datetime.now)
 
 
 @dataclass
 class ClaudeCodeResponse:
     """Claude Code 响应"""
-    messages: List[ClaudeCodeMessage]
-    status: Literal['success', 'error', 'streaming']
-    error: Optional[str] = None
-    metadata: Optional[Dict[str, Any]] = None
+
+    messages: list[ClaudeCodeMessage]
+    status: Literal["success", "error", "streaming"]
+    error: str | None = None
+    metadata: dict[str, Any] | None = None
 
 
 @dataclass
 class ClaudeCodeContext:
     """Claude Code 上下文"""
+
     session_id: str
-    user: Optional[Dict[str, Any]] = None
-    history: Optional[List[ClaudeCodeMessage]] = None
-    context_data: Optional[Dict[str, Any]] = None
+    user: dict[str, Any] | None = None
+    history: list[ClaudeCodeMessage] | None = None
+    context_data: dict[str, Any] | None = None
 
 
 @dataclass
 class TaskResult:
     """任务执行结果"""
+
     task_id: str
-    status: Literal['pending', 'in_progress', 'completed', 'failed']
-    result: Optional[Any] = None
-    error: Optional[str] = None
+    status: Literal["pending", "in_progress", "completed", "failed"]
+    result: Any | None = None
+    error: str | None = None
     start_time: datetime = field(default_factory=datetime.now)
-    end_time: Optional[datetime] = None
+    end_time: datetime | None = None
 
 
 @dataclass
 class TodoItem:
     """待办事项"""
+
     id: str
     content: str
-    status: Literal['pending', 'in_progress', 'completed']
-    priority: Literal['high', 'medium', 'low']
+    status: Literal["pending", "in_progress", "completed"]
+    priority: Literal["high", "medium", "low"]
     created_at: datetime = field(default_factory=datetime.now)
-    updated_at: Optional[datetime] = None
-    completed_at: Optional[datetime] = None
+    updated_at: datetime | None = None
+    completed_at: datetime | None = None
 
 
 class ToolPermission(TypedDict, total=False):
     """工具权限配置"""
+
     tool: ClaudeCodeTool
     allowed: bool
-    restrictions: Optional[List[str]]
-    description: Optional[str]
+    restrictions: list[str] | None
+    description: str | None
