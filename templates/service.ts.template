@@ -1,0 +1,163 @@
+import { ref, reactive } from 'vue'
+import type { Ref } from 'vue'
+
+// 类型定义
+interface {{ServiceName}}Config {
+  baseURL?: string
+  timeout?: number
+  retries?: number
+}
+
+interface {{ServiceName}}State {
+  loading: boolean
+  error: string | null
+  data: any | null
+}
+
+interface {{ServiceName}}Response<T = any> {
+  success: boolean
+  data?: T
+  message?: string
+  error?: string
+}
+
+/**
+ * {{ServiceName}} 服务类
+ * 提供 {{description}} 相关功能
+ */
+export class {{ServiceName}}Service {
+  private config: {{ServiceName}}Config
+  private state: {{ServiceName}}State
+
+  constructor(config: {{ServiceName}}Config = {}) {
+    this.config = {
+      baseURL: '/api/v1',
+      timeout: 5000,
+      retries: 3,
+      ...config
+    }
+
+    this.state = reactive({
+      loading: false,
+      error: null,
+      data: null
+    })
+  }
+
+  /**
+   * 获取服务状态
+   */
+  getState(): {{ServiceName}}State {
+    return this.state
+  }
+
+  /**
+   * 重置状态
+   */
+  resetState(): void {
+    this.state.loading = false
+    this.state.error = null
+    this.state.data = null
+  }
+
+  /**
+   * 发送HTTP请求
+   */
+  private async request<T>(
+    endpoint: string,
+    options: RequestInit = {}
+  ): Promise<{{ServiceName}}Response<T>> {
+    this.state.loading = true
+    this.state.error = null
+
+    try {
+      const response = await fetch(`${this.config.baseURL}${endpoint}`, {
+        timeout: this.config.timeout,
+        headers: {
+          'Content-Type': 'application/json',
+          ...options.headers
+        },
+        ...options
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+      }
+
+      const data = await response.json()
+      this.state.data = data
+      
+      return {
+        success: true,
+        data
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '未知错误'
+      this.state.error = message
+      
+      return {
+        success: false,
+        error: message
+      }
+    } finally {
+      this.state.loading = false
+    }
+  }
+
+  /**
+   * GET请求
+   */
+  async get<T>(endpoint: string): Promise<{{ServiceName}}Response<T>> {
+    return this.request<T>(endpoint, { method: 'GET' })
+  }
+
+  /**
+   * POST请求
+   */
+  async post<T>(endpoint: string, data?: any): Promise<{{ServiceName}}Response<T>> {
+    return this.request<T>(endpoint, {
+      method: 'POST',
+      body: data ? JSON.stringify(data) : undefined
+    })
+  }
+
+  /**
+   * PUT请求
+   */
+  async put<T>(endpoint: string, data?: any): Promise<{{ServiceName}}Response<T>> {
+    return this.request<T>(endpoint, {
+      method: 'PUT',
+      body: data ? JSON.stringify(data) : undefined
+    })
+  }
+
+  /**
+   * DELETE请求
+   */
+  async delete<T>(endpoint: string): Promise<{{ServiceName}}Response<T>> {
+    return this.request<T>(endpoint, { method: 'DELETE' })
+  }
+}
+
+/**
+ * 创建{{ServiceName}}服务实例
+ */
+export function create{{ServiceName}}Service(config?: {{ServiceName}}Config): {{ServiceName}}Service {
+  return new {{ServiceName}}Service(config)
+}
+
+/**
+ * 使用{{ServiceName}}服务的Composable
+ */
+export function use{{ServiceName}}Service(config?: {{ServiceName}}Config) {
+  const service = create{{ServiceName}}Service(config)
+  const state = service.getState()
+
+  return {
+    service,
+    state,
+    loading: ref(state.loading),
+    error: ref(state.error),
+    data: ref(state.data)
+  }
+}

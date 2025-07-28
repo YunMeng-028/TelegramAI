@@ -1,0 +1,89 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+        args: ['--maxkb=500']
+      - id: check-json
+      - id: check-toml
+      - id: check-merge-conflict
+      - id: check-case-conflict
+      - id: detect-private-key
+      - id: debug-statements
+      - id: mixed-line-ending
+        args: ['--fix=lf']
+
+  - repo: https://github.com/psf/black
+    rev: 24.4.2
+    hooks:
+      - id: black
+        language_version: python3.12
+
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: v0.5.5
+    hooks:
+      - id: ruff
+        args: [--fix, --exit-non-zero-on-fix]
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.11.1
+    hooks:
+      - id: mypy
+        additional_dependencies:
+          - pydantic
+          - types-aiofiles
+          - types-cachetools
+        args: [--config-file=pyproject.toml]
+
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.9
+    hooks:
+      - id: bandit
+        args: ['-c', 'pyproject.toml']
+        exclude: tests/
+
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v3.28.0
+    hooks:
+      - id: commitizen
+        stages: [commit-msg]
+
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v3.1.0
+    hooks:
+      - id: prettier
+        types_or: [javascript, jsx, ts, tsx, vue, css, scss, json, yaml, markdown]
+        exclude: '^(backend/|poetry.lock|package-lock.json)'
+
+  - repo: local
+    hooks:
+      - id: eslint
+        name: eslint
+        entry: npx eslint --fix
+        language: node
+        types: [javascript, jsx, typescript, tsx, vue]
+        exclude: '^(backend/|node_modules/|dist/)'
+        
+      - id: vue-tsc
+        name: vue-tsc
+        entry: npx vue-tsc --noEmit
+        language: node
+        files: '\.(vue|ts|tsx)$'
+        exclude: '^(backend/|node_modules/|dist/)'
+        
+      - id: pytest
+        name: pytest
+        entry: poetry run pytest
+        language: system
+        files: '^backend/.*\.py$'
+        pass_filenames: false
+        
+      - id: poetry-check
+        name: poetry-check
+        entry: poetry check
+        language: system
+        files: 'pyproject.toml'
+        pass_filenames: false

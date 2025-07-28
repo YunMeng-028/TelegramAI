@@ -1,0 +1,54 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "preserve",
+    
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["frontend/src/*"],
+      "~/*": ["frontend/*"]
+    },
+    
+    "types": [
+      "vite/client",
+      "node",
+      "element-plus/global",
+      "@types/node",
+      "@types/crypto-js",
+      "@types/nprogress"
+    ]
+  },
+  "include": [
+    "frontend/**/*.ts",
+    "frontend/**/*.tsx",
+    "frontend/**/*.vue",
+    "frontend/types/**/*.d.ts",
+    "vite.config.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "dist-electron",
+    "backend"
+  ],
+  "references": [
+    {
+      "path": "./tsconfig.node.json"
+    }
+  ]
+}

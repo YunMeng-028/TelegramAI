@@ -1,0 +1,212 @@
+from typing import Optional, Dict, Any, List
+from dataclasses import dataclass
+from abc import ABC, abstractmethod
+import asyncio
+import logging
+from datetime import datetime
+
+# 配置日志
+logger = logging.getLogger(__name__)
+
+@dataclass
+class {{ServiceName}}Config:
+    """{{ServiceName}}服务配置"""
+    timeout: int = 30
+    max_retries: int = 3
+    retry_delay: float = 1.0
+    debug: bool = False
+
+@dataclass
+class {{ServiceName}}Result:
+    """{{ServiceName}}服务结果"""
+    success: bool
+    data: Optional[Any] = None
+    error: Optional[str] = None
+    timestamp: datetime = None
+    
+    def __post_init__(self):
+        if self.timestamp is None:
+            self.timestamp = datetime.utcnow()
+
+class {{ServiceName}}Exception(Exception):
+    """{{ServiceName}}服务异常"""
+    pass
+
+class {{ServiceName}}Interface(ABC):
+    """{{ServiceName}}服务接口"""
+    
+    @abstractmethod
+    async def process(self, data: Dict[str, Any]) -> {{ServiceName}}Result:
+        """处理数据"""
+        pass
+    
+    @abstractmethod
+    async def validate(self, data: Dict[str, Any]) -> bool:
+        """验证数据"""
+        pass
+
+class {{ServiceName}}Service({{ServiceName}}Interface):
+    """{{ServiceName}}服务实现
+    
+    提供{{description}}相关功能
+    """
+    
+    def __init__(self, config: Optional[{{ServiceName}}Config] = None):
+        self.config = config or {{ServiceName}}Config()
+        self._initialized = False
+        self._stats = {
+            'requests': 0,
+            'successes': 0,
+            'failures': 0,
+            'last_request': None
+        }
+        
+        if self.config.debug:
+            logging.basicConfig(level=logging.DEBUG)
+    
+    async def initialize(self) -> None:
+        """初始化服务"""
+        if self._initialized:
+            return
+            
+        logger.info(f"正在初始化{self.__class__.__name__}...")
+        
+        try:
+            await self._setup()
+            self._initialized = True
+            logger.info(f"{self.__class__.__name__}初始化完成")
+        except Exception as e:
+            logger.error(f"{self.__class__.__name__}初始化失败: {e}")
+            raise {{ServiceName}}Exception(f"服务初始化失败: {e}")
+    
+    async def _setup(self) -> None:
+        """设置服务（子类可重写）"""
+        # 在这里添加具体的初始化逻辑
+        await asyncio.sleep(0.1)  # 模拟异步初始化
+    
+    async def process(self, data: Dict[str, Any]) -> {{ServiceName}}Result:
+        """处理数据"""
+        if not self._initialized:
+            await self.initialize()
+        
+        self._stats['requests'] += 1
+        self._stats['last_request'] = datetime.utcnow()
+        
+        try:
+            # 验证输入数据
+            if not await self.validate(data):
+                raise {{ServiceName}}Exception("输入数据验证失败")
+            
+            # 执行处理逻辑
+            result_data = await self._process_internal(data)
+            
+            self._stats['successes'] += 1
+            return {{ServiceName}}Result(
+                success=True,
+                data=result_data
+            )
+            
+        except Exception as e:
+            self._stats['failures'] += 1
+            logger.error(f"处理失败: {e}")
+            return {{ServiceName}}Result(
+                success=False,
+                error=str(e)
+            )
+    
+    async def _process_internal(self, data: Dict[str, Any]) -> Any:
+        """内部处理逻辑（子类应重写）"""
+        # 在这里实现具体的业务逻辑
+        logger.info(f"处理数据: {data}")
+        
+        # 模拟异步处理
+        await asyncio.sleep(0.1)
+        
+        return {
+            'processed': True,
+            'input_data': data,
+            'result': '处理完成'
+        }
+    
+    async def validate(self, data: Dict[str, Any]) -> bool:
+        """验证数据"""
+        if not isinstance(data, dict):
+            return False
+        
+        # 添加具体的验证逻辑
+        required_fields = ['input']  # 根据需要修改
+        return all(field in data for field in required_fields)
+    
+    async def batch_process(self, data_list: List[Dict[str, Any]]) -> List[{{ServiceName}}Result]:
+        """批量处理数据"""
+        tasks = [self.process(data) for data in data_list]
+        return await asyncio.gather(*tasks)
+    
+    def get_stats(self) -> Dict[str, Any]:
+        """获取服务统计信息"""
+        return self._stats.copy()
+    
+    async def health_check(self) -> bool:
+        """健康检查"""
+        try:
+            if not self._initialized:
+                return False
+            
+            # 执行简单的健康检查
+            test_data = {'input': 'health_check'}
+            result = await self.process(test_data)
+            return result.success
+            
+        except Exception as e:
+            logger.error(f"健康检查失败: {e}")
+            return False
+    
+    async def shutdown(self) -> None:
+        """关闭服务"""
+        logger.info(f"正在关闭{self.__class__.__name__}...")
+        
+        try:
+            await self._cleanup()
+            self._initialized = False
+            logger.info(f"{self.__class__.__name__}已关闭")
+        except Exception as e:
+            logger.error(f"关闭服务时出错: {e}")
+    
+    async def _cleanup(self) -> None:
+        """清理资源（子类可重写）"""
+        # 在这里添加清理逻辑
+        pass
+
+# 示例用法
+if __name__ == "__main__":
+    async def main():
+        # 创建服务配置
+        config = {{ServiceName}}Config(
+            timeout=10,
+            debug=True
+        )
+        
+        # 创建服务实例
+        service = {{ServiceName}}Service(config)
+        
+        try:
+            # 初始化服务
+            await service.initialize()
+            
+            # 处理数据
+            test_data = {'input': '测试数据'}
+            result = await service.process(test_data)
+            
+            print(f"处理结果: {result}")
+            print(f"服务统计: {service.get_stats()}")
+            
+            # 健康检查
+            healthy = await service.health_check()
+            print(f"服务健康状态: {healthy}")
+            
+        finally:
+            # 关闭服务
+            await service.shutdown()
+    
+    # 运行示例
+    asyncio.run(main())

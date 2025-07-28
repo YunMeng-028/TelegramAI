@@ -1,0 +1,37 @@
+[run]
+source = backend/telegram_ai
+omit = 
+    */tests/*
+    */test_*
+    */__pycache__/*
+    */venv/*
+    */env/*
+    */migrations/*
+    */settings/*
+    */config.py
+    */manage.py
+    */wsgi.py
+    */asgi.py
+    backend/main.py
+
+[report]
+precision = 2
+show_missing = True
+skip_covered = False
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    if self.debug:
+    if __name__ == .__main__.:
+    raise AssertionError
+    raise NotImplementedError
+    if TYPE_CHECKING:
+    class .*\(Protocol\):
+    @(abc\.)?abstractmethod
+
+[html]
+directory = htmlcov
+title = TelegramAI Coverage Report
+
+[xml]
+output = coverage.xml

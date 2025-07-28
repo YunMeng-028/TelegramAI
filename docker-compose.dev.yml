@@ -1,0 +1,112 @@
+version: '3.8'
+
+services:
+  # 开发环境主容器
+  telegramai-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: telegramai-dev
+    volumes:
+      - .:/workspace
+      - node_modules:/workspace/node_modules
+      - venv:/workspace/.venv
+      - ~/.ssh:/home/developer/.ssh:ro
+      - ~/.gitconfig:/home/developer/.gitconfig:ro
+    ports:
+      - "5173:5173"   # Vite开发服务器
+      - "8000:8000"   # Python后端
+      - "9090:9090"   # 监控端口
+      - "24678:24678" # VS Code Server
+    environment:
+      - NODE_ENV=development
+      - PYTHONPATH=/workspace/backend
+      - DISPLAY=:99
+    networks:
+      - telegramai-dev
+    tty: true
+    stdin_open: true
+    
+  # Redis缓存服务
+  redis:
+    image: redis:7-alpine
+    container_name: telegramai-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - telegramai-dev
+    command: redis-server --appendonly yes
+
+  # PostgreSQL数据库（可选，用于测试）
+  postgres:
+    image: postgres:15-alpine
+    container_name: telegramai-postgres
+    environment:
+      - POSTGRES_DB=telegramai_test
+      - POSTGRES_USER=telegramai
+      - POSTGRES_PASSWORD=telegramai_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - telegramai-dev
+
+  # Nginx代理（开发环境）
+  nginx-dev:
+    image: nginx:alpine
+    container_name: telegramai-nginx-dev
+    ports:
+      - "80:80"
+    volumes:
+      - ./docker/nginx/dev.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - telegramai-dev
+    networks:
+      - telegramai-dev
+
+  # 监控服务
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: telegramai-prometheus
+    ports:
+      - "9091:9090"
+    volumes:
+      - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    networks:
+      - telegramai-dev
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+
+  # Grafana仪表板
+  grafana:
+    image: grafana/grafana:latest
+    container_name: telegramai-grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./docker/grafana/provisioning:/etc/grafana/provisioning
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    networks:
+      - telegramai-dev
+
+volumes:
+  node_modules:
+  venv:
+  redis_data:
+  postgres_data:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  telegramai-dev:
+    driver: bridge

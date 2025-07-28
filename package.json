@@ -1,0 +1,180 @@
+{
+  "name": "telegram-ai-desktop",
+  "version": "1.0.0",
+  "description": "TelegramAI智能交互助手 - 桌面客户端",
+  "main": "frontend/electron/main.js",
+  "author": "TelegramAI Team",
+  "license": "Proprietary",
+  "private": true,
+  "engines": {
+    "node": ">=22.17.1",
+    "npm": ">=10.0.0"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "electron": "electron .",
+    "electron:dev": "concurrently \"npm run dev\" \"wait-on http://localhost:5173 && cross-env NODE_ENV=development electron .\"",
+    "electron:build": "electron-builder",
+    "dist": "npm run build && npm run electron:build",
+    "dist:win": "npm run build && electron-builder --win",
+    "dist:mac": "npm run build && electron-builder --mac",
+    "dist:linux": "npm run build && electron-builder --linux",
+    "postinstall": "electron-builder install-app-deps",
+    "lint": "eslint . --ext .vue,.js,.jsx,.ts,.tsx,.cjs,.mjs --fix --ignore-path .gitignore",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,vue,json,css,scss,md}\"",
+    "type-check": "vue-tsc --noEmit",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage",
+    "prepare": "husky install",
+    "commit": "cz"
+  },
+  "dependencies": {
+    "@anthropic-ai/claude-code": "^1.0.0",
+    "zeromq": "6.0.0",
+    "electron-store": "10.0.0",
+    "electron-updater": "6.3.0",
+    "electron-log": "5.1.7",
+    "node-machine-id": "1.1.12",
+    "crypto-js": "4.2.0"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "19.3.0",
+    "@commitlint/config-conventional": "19.2.2",
+    "@electron-forge/cli": "7.4.0",
+    "@types/crypto-js": "4.2.2",
+    "@types/node": "22.0.0",
+    "@typescript-eslint/eslint-plugin": "7.17.0",
+    "@typescript-eslint/parser": "7.17.0",
+    "@vitejs/plugin-vue": "5.1.2",
+    "@vitest/coverage-v8": "2.0.5",
+    "@vitest/ui": "2.0.5",
+    "@vue/eslint-config-prettier": "9.0.0",
+    "@vue/eslint-config-typescript": "13.0.0",
+    "@vue/test-utils": "2.4.6",
+    "@vueuse/core": "10.11.0",
+    "autoprefixer": "10.4.19",
+    "commitizen": "4.3.0",
+    "concurrently": "8.2.2",
+    "cross-env": "7.0.3",
+    "cz-conventional-changelog": "3.3.0",
+    "electron": "37.2.4",
+    "electron-builder": "25.0.5",
+    "electron-devtools-installer": "3.2.0",
+    "eslint": "9.8.0",
+    "eslint-plugin-vue": "9.27.0",
+    "happy-dom": "14.12.3",
+    "husky": "9.1.4",
+    "lint-staged": "15.2.7",
+    "postcss": "8.4.40",
+    "prettier": "3.3.3",
+    "sass": "1.77.8",
+    "tailwindcss": "3.4.7",
+    "typescript": "5.5.4",
+    "unplugin-auto-import": "0.18.2",
+    "unplugin-vue-components": "0.27.3",
+    "vite": "5.3.5",
+    "vite-plugin-electron": "0.28.7",
+    "vite-plugin-electron-renderer": "0.14.5",
+    "vitest": "2.0.5",
+    "vue": "3.4.35",
+    "vue-router": "4.4.0",
+    "vue-tsc": "2.0.29",
+    "wait-on": "7.2.0",
+    "pinia": "2.2.0",
+    "pinia-plugin-persistedstate": "3.2.1",
+    "element-plus": "2.8.0",
+    "@element-plus/icons-vue": "2.3.1",
+    "axios": "1.7.3",
+    "dayjs": "1.11.12",
+    "echarts": "5.5.1",
+    "vue-echarts": "6.7.3",
+    "@vueuse/integrations": "10.11.0",
+    "nprogress": "0.2.0",
+    "@types/nprogress": "0.2.3"
+  },
+  "build": {
+    "appId": "com.telegramai.desktop",
+    "productName": "TelegramAI",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "frontend/**/*",
+      "!frontend/src/**/*.{ts,tsx}",
+      "!frontend/**/*.map",
+      "backend/dist/**/*",
+      "!backend/dist/**/*.pyc",
+      "!backend/dist/**/__pycache__",
+      "resources/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "backend/dist",
+        "to": "app/backend"
+      },
+      {
+        "from": "resources",
+        "to": "resources"
+      }
+    ],
+    "asar": true,
+    "asarUnpack": [
+      "**/*.node",
+      "**/node_modules/zeromq/**"
+    ],
+    "mac": {
+      "category": "public.app-category.productivity",
+      "icon": "resources/icon.icns",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "resources/icon.ico",
+      "publisherName": "TelegramAI Team",
+      "verifyUpdateCodeSignature": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "license": "resources/license.txt",
+      "deleteAppDataOnUninstall": true
+    },
+    "linux": {
+      "target": ["AppImage", "deb"],
+      "category": "Utility",
+      "icon": "resources/icon.png"
+    },
+    "publish": {
+      "provider": "github",
+      "releaseType": "draft"
+    }
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,vue}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,yml,yaml}": [
+      "prettier --write"
+    ]
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  }
+}

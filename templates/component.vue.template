@@ -1,0 +1,71 @@
+<template>
+  <div class="{{componentName | kebab-case}}">
+    <h2>{{ title }}</h2>
+    <p>{{ description }}</p>
+    <!-- 组件内容 -->
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, computed } from 'vue'
+
+// Props定义
+interface Props {
+  title?: string
+  description?: string
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  title: '默认标题',
+  description: '默认描述'
+})
+
+// Emits定义
+interface Emits {
+  update: [value: string]
+  click: [event: MouseEvent]
+}
+
+const emit = defineEmits<Emits>()
+
+// 响应式数据
+const count = ref(0)
+const isVisible = ref(true)
+
+// 计算属性
+const displayText = computed(() => {
+  return `${props.title} - ${count.value}`
+})
+
+// 方法
+const handleClick = (event: MouseEvent) => {
+  count.value++
+  emit('click', event)
+}
+
+const updateValue = (value: string) => {
+  emit('update', value)
+}
+</script>
+
+<style scoped>
+.{{componentName | kebab-case}} {
+  padding: 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  background-color: #ffffff;
+}
+
+.{{componentName | kebab-case}} h2 {
+  margin: 0 0 0.5rem 0;
+  color: #1a202c;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.{{componentName | kebab-case}} p {
+  margin: 0;
+  color: #4a5568;
+  line-height: 1.5;
+}
+</style>
