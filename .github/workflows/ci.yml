@@ -62,7 +62,7 @@ jobs:
           --junitxml=pytest.xml
     
     - name: Upload test results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: backend-test-results
@@ -106,7 +106,7 @@ jobs:
       run: npm run test:coverage
     
     - name: Upload test results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: frontend-test-results
@@ -179,7 +179,7 @@ jobs:
       run: npm run dist:mac
     
     - name: Upload build artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: build-${{ matrix.os }}
         path: dist/
